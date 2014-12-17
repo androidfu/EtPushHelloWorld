@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-    <!--
+<?xml version="1.0" encoding="utf-8"?><!--
         TODO Update the package to match your application's package
     -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -53,7 +52,7 @@
         -->
         <!--
             Introduced in 3.5.x
-        <receiver android:name="com.exacttarget.etpushsdk.ETPackageReplacedReceiver" />
+            <receiver android:name="com.exacttarget.etpushsdk.ETPackageReplacedReceiver" />
         -->
         <!--
             Required by Location Services

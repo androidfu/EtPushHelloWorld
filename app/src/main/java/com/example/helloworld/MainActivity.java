@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETLocationManager;
@@ -52,11 +50,10 @@ public class MainActivity extends Activity {
                     If we're watching for location then also watch for beacons if possible.
                  */
                 try {
-                    if(!ETLocationManager.locationManager().startWatchingProximity()) {
+                    if (!ETLocationManager.locationManager().startWatchingProximity()) {
                         promptForBluetoothSettings();
                     }
-                }
-                catch(BleNotAvailableException e) {
+                } catch (BleNotAvailableException e) {
                     Log.w(TAG, "BLE is not available on this device");
                     //sharedPreferences.edit().putBoolean("pref_proximity", false).commit();
                     ETLocationManager.locationManager().stopWatchingProximity();
@@ -82,11 +79,9 @@ public class MainActivity extends Activity {
                         }
                         try {
                             ETLocationManager.locationManager().startWatchingProximity();
-                        }
-                        catch (BleNotAvailableException e) {
+                        } catch (BleNotAvailableException e) {
                             Log.e(TAG, e.getMessage(), e);
-                        }
-                        catch (ETException e) {
+                        } catch (ETException e) {
                             Log.e(TAG, e.getMessage(), e);
                         }
                     }
