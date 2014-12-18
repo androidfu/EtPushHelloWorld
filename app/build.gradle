@@ -43,10 +43,10 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.2'
 
     // 3rd Party Libraries Req. for SDK integration
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.0.1'
-    compile 'org.joda:joda-convert:1.4'
-    compile 'joda-time:joda-time:2.2'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.4' // previously 2.4.3
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.0.6' // previously 2.0.1
+    compile 'org.joda:joda-convert:1.7' // previously 1.4
+    compile 'joda-time:joda-time:2.6'   // previously 2.2
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'com.j256.ormlite:ormlite-core:4.48'
     compile 'com.belladati:httpclientandroidlib:4.3.0'
