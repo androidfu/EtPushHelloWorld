@@ -27,7 +27,7 @@ public class HelloWorldApplication extends Application {
     public static final boolean LOCATION_ENABLED = false;
     public static final boolean ANALYTICS_ENABLED = false;
     public static final boolean CLOUD_PAGES_ENABLED = false;
-    public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 1;
+    public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 15; // 15 min.
     public static final String EXTRAS_REGISTRATION_EVENT = "event";
 
     public static String VERSION_NAME;
