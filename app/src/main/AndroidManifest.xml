@@ -19,22 +19,20 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
-    <!--
-        Additional Permissions required by JB4SDK
-    -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--         Additional Permissions required by JB4SDK -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
-    <!--
-        Required if you're going to use Location
-    -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
+    <!-- &lt;!&ndash; -->
+    <!-- Required if you're going to use Location -->
+    <!-- &ndash;&gt; -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
+    <!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
     <!--
         Don't forget to add an Application class to your application and call readyAimFire()
         TODO Update the name to match your app's application class
@@ -54,39 +52,36 @@
             Introduced in 3.5.x
             <receiver android:name="com.exacttarget.etpushsdk.ETPackageReplacedReceiver" />
         -->
-        <!--
-            Required by Location Services
-        -->
-        <receiver android:name="com.exacttarget.etpushsdk.location.receiver.LocationChangedReceiver" />
-        <receiver android:name="com.exacttarget.etpushsdk.location.receiver.PassiveLocationChangedReceiver" />
-        <receiver android:name="com.exacttarget.etpushsdk.ETLocationTimeoutReceiver" />
-        <receiver android:name="com.exacttarget.etpushsdk.ETLocationWakeupReceiver" />
-        <receiver android:name="com.exacttarget.etpushsdk.ETGeofenceReceiver" />
-        <receiver android:name="com.exacttarget.etpushsdk.ETLocationProviderChangeReceiver">
-            <intent-filter>
-                <action android:name="android.location.PROVIDERS_CHANGED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
+        <!--             Required by Location Services -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.location.receiver.LocationChangedReceiver" /> -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.location.receiver.PassiveLocationChangedReceiver" /> -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.ETLocationTimeoutReceiver" /> -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.ETLocationWakeupReceiver" /> -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.ETGeofenceReceiver" /> -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.ETLocationProviderChangeReceiver"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.location.PROVIDERS_CHANGED" /> -->
+        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
 
-        <!--
-            Figure out where they are if they just turned on their phone (e.g. plane trip)
-        -->
-        <receiver android:name="com.exacttarget.etpushsdk.location.receiver.BootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
-        <!--
-            ???
-        -->
-        <receiver android:name="com.exacttarget.etpushsdk.location.receiver.PowerStateChangedReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_BATTERY_LOW" />
-                <action android:name="android.intent.action.ACTION_BATTERY_OKAY" />
-            </intent-filter>
-        </receiver>
+        <!--             Figure out where they are if they just turned on their phone (e.g. plane trip) -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.location.receiver.BootReceiver"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
+
+
+        <!--             ??? -->
+        <!-- <receiver android:name="com.exacttarget.etpushsdk.location.receiver.PowerStateChangedReceiver"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.ACTION_BATTERY_LOW" /> -->
+        <!-- <action android:name="android.intent.action.ACTION_BATTERY_OKAY" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
+
 
         <!--
             Generic receiver to handle push notifications.  Extend or replace this class to change
@@ -104,29 +99,29 @@
             </intent-filter>
         </receiver>
 
-        <!--
-            ET Broadcast Receivers for for sending data (required)
-        -->
+        <!-- ET Broadcast Receiver for handling notification taps. -->
+        <receiver android:name="com.exacttarget.etpushsdk.ETOpenReceiver">
+            <intent-filter>
+                <action android:name="com.example.helloworld.MESSAGE_OPENED" />
+            </intent-filter>
+        </receiver>
+
+        <!--             ET Broadcast Receivers for for sending data (required) -->
         <receiver android:name="com.exacttarget.etpushsdk.ETSendDataReceiver" />
 
-        <!--
-            ET Service handlers for sending data (required)
-        -->
+        <!--             ET Service handlers for sending data (required) -->
         <service android:name="com.exacttarget.etpushsdk.ETSendDataIntentService" />
 
-        <!--
-            Location related services
-        -->
-        <service android:name="com.exacttarget.etpushsdk.ETLocationTimeoutService" />
-        <service android:name="com.exacttarget.etpushsdk.ETLocationWakeupService" />
-        <service android:name="com.exacttarget.etpushsdk.ETLocationProviderChangeService" />
-        <service android:name="com.exacttarget.etpushsdk.ETGeofenceIntentService" />
+        <!--             Location related services -->
+        <!-- <service android:name="com.exacttarget.etpushsdk.ETLocationTimeoutService" /> -->
+        <!-- <service android:name="com.exacttarget.etpushsdk.ETLocationWakeupService" /> -->
+        <!-- <service android:name="com.exacttarget.etpushsdk.ETLocationProviderChangeService" /> -->
+        <!-- <service android:name="com.exacttarget.etpushsdk.ETGeofenceIntentService" /> -->
 
-        <!--
-            TODO Point this to your app's activity
-        -->
+
+        <!--             TODO Point this to your app's activity -->
         <activity
-            android:name="com.example.helloworld.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:label="@string/app_name" />
 
         <!--
@@ -146,8 +141,8 @@
             field but it seems safer to just put it at the end of the activity list. BMOTE 20141210
         -->
         <activity-alias
-            android:name=".ApplicationLauncher"
-            android:targetActivity=".MainActivity">
+            android:name="com.example.helloworld.ApplicationLauncher"
+            android:targetActivity=".ui.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -159,6 +154,14 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <receiver
+            android:name=".receivers.MtAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="mt_propagation_alarm" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

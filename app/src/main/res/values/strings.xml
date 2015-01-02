@@ -3,5 +3,7 @@
 
     <string name="app_name">Hello World</string>
     <string name="hello_world">Hello world!</string>
+    <string name="notification_title">Marketing Cloud Updated</string>
+    <string name="notification_body">Update sent at %1$s has been propagated.</string>
 
 </resources>

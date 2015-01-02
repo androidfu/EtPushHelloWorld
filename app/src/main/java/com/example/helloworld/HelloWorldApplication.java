@@ -1,7 +1,13 @@
 package com.example.helloworld;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.exacttarget.etpushsdk.ETException;
@@ -21,9 +27,13 @@ public class HelloWorldApplication extends Application {
     public static final boolean LOCATION_ENABLED = false;
     public static final boolean ANALYTICS_ENABLED = false;
     public static final boolean CLOUD_PAGES_ENABLED = false;
+    public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 1;
+    public static final String EXTRAS_REGISTRATION_EVENT = "event";
 
     public static String VERSION_NAME;
     public static int VERSION_CODE;
+
+    private static long okToCheckMiddleTier;
 
     @Override
     public void onCreate() {
@@ -103,6 +113,7 @@ public class HelloWorldApplication extends Application {
         } catch (PackageManager.NameNotFoundException e) {
 
             throw new RuntimeException(e.getMessage());
+
         }
     }
 
@@ -126,9 +137,55 @@ public class HelloWorldApplication extends Application {
 
             Log.d(TAG, "Tags: " + event.getTags());
             Log.d(TAG, "Language: " + event.getLocale());
-
+            Log.d(TAG, String.format("Last sent: %1$d", System.currentTimeMillis()));
         }
 
-    }
+        /**
+         * BEGIN Developer Helper Notification
+         *
+         * Notify me when my changes have been propagated by the Middle Tier to the Marketing
+         * Cloud.  This should never be required in a production application.
+         */
+        if (!BuildConfig.DEBUG) {
+            return;
+        }
 
+        /*
+            The middle tier has a 15 min. delay in data propagation.  Make sure we're waiting an
+            appropriate amount of time before having our tests run.
+        */
+        long proposedCheckTime = System.currentTimeMillis() + MIDDLE_TIER_PROPAGATION_MIN_DELAY;
+        /*
+            Because we have async tasks, never set an alarm for the middle tier that would be
+            earlier than any previous alarm.
+
+            This could be expanded to handle multiple alarms but that is overkill at the moment.
+         */
+        if (proposedCheckTime < okToCheckMiddleTier) {
+            return;
+        }
+        // getLastSent() is returning 0, but I need to discuss with team.
+        if (event.getLastSent() == 0) {
+            event.setLastSent(System.currentTimeMillis());
+        }
+        okToCheckMiddleTier = proposedCheckTime;
+        Log.v(TAG, String.format("Setting an alarm for %3$dms from %1$d (alarm time: %2$d)", System.currentTimeMillis(), okToCheckMiddleTier, okToCheckMiddleTier - System.currentTimeMillis()));
+        Intent intent = new Intent("mt_propagation_alarm");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(EXTRAS_REGISTRATION_EVENT, event);
+        intent.putExtras(bundle);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, R.id.mt_alarm, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Service.ALARM_SERVICE);
+        /*
+            Cancel any existing alarms as we're about to set one that will account for the latest
+            change.
+         */
+        alarmManager.cancel(pendingIntent);
+        alarmManager.set(
+                AlarmManager.RTC_WAKEUP,
+                okToCheckMiddleTier,
+                pendingIntent
+        );
+    }
 }
