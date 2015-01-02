@@ -165,9 +165,8 @@ public class HelloWorldApplication extends Application {
             return;
         }
         // getLastSent() is returning 0, but I need to discuss with team.
-        if (event.getLastSent() == 0) {
-            event.setLastSent(System.currentTimeMillis());
-        }
+        event.setLastSent(System.currentTimeMillis());
+
         okToCheckMiddleTier = proposedCheckTime;
         Log.v(TAG, String.format("Setting an alarm for %3$dms from %1$d (alarm time: %2$d)", System.currentTimeMillis(), okToCheckMiddleTier, okToCheckMiddleTier - System.currentTimeMillis()));
         Intent intent = new Intent("mt_propagation_alarm");
