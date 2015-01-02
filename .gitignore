@@ -27,6 +27,7 @@ build
 # API Keys, etc.
 secret.xml
 secrets.xml
+api_key.txt
 
 /local.properties
 /.idea/workspace.xml
