@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     TODO Update the package to match your application's package
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,6 +25,7 @@
         Additional Permissions required by JB4SDK
     -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -36,6 +36,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- JB4A SDK Permissions for iBeacons -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- END JB4A SDK Permissions for iBeacons -->
+
     <!--
         Don't forget to add an Application class to your application and call readyAimFire()
         TODO Update the name to match your app's application class
@@ -130,11 +136,39 @@
         <!--
             Location related services
         -->
-        <service android:name="com.exacttarget.etpushsdk.ETLocationTimeoutService" />
-        <service android:name="com.exacttarget.etpushsdk.ETLocationWakeupService" />
-        <service android:name="com.exacttarget.etpushsdk.ETLocationProviderChangeService" />
-        <service android:name="com.exacttarget.etpushsdk.ETGeofenceIntentService" />
+        <service
+            android:name="com.exacttarget.etpushsdk.ETLocationTimeoutService"
+            android:enabled="true" />
+        <service
+            android:name="com.exacttarget.etpushsdk.ETLocationWakeupService"
+            android:enabled="true" />
+        <service
+            android:name="com.exacttarget.etpushsdk.ETLocationProviderChangeService"
+            android:enabled="true" />
+        <service
+            android:name="com.exacttarget.etpushsdk.ETGeofenceIntentService"
+            android:enabled="true" />
 
+        <!--
+            JB4A SDK Service handlers for iBeacons
+        -->
+        <service
+            android:name="com.radiusnetworks.ibeacon.service.IBeaconService"
+            android:enabled="true"
+            android:exported="true"
+            android:isolatedProcess="false"
+            android:label="iBeacon" />
+        <service
+            android:name="com.radiusnetworks.ibeacon.IBeaconIntentProcessor"
+            android:enabled="true">
+            <meta-data
+                android:name="background"
+                android:value="true" />
+            <intent-filter android:priority="1">
+                <action android:name="com.exacttarget.jb4a.sdk_tester.DID_RANGING" />
+                <action android:name="com.exacttarget.jb4a.sdk_tester.DID_MONITORING" />
+            </intent-filter>
+        </service>
 
         <!--
             TODO Point this to your app's activity

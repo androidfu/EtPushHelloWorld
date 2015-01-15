@@ -23,5 +23,8 @@
     <string name="togglebtn_disable_push">Disabled</string>
     <string name="togglebtn_enable_location">Watching</string>
     <string name="togglebtn_enable_push">Enabled</string>
+    <string name="label_proximity">PROXIMITY</string>
+    <string name="togglebtn_disable_proximity">Not Watching</string>
+    <string name="togglebtn_enable_proximity">Watching</string>
 
 </resources>

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.ToggleButton;
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETLocationManager;
 import com.exacttarget.etpushsdk.ETPush;
+import com.example.helloworld.BuildConfig;
 import com.example.helloworld.HelloWorldApplication;
 import com.example.helloworld.R;
 import com.radiusnetworks.ibeacon.BleNotAvailableException;
@@ -25,9 +27,10 @@ import com.radiusnetworks.ibeacon.BleNotAvailableException;
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String KEY_FIRST_LAUNCH = "first_launch";
+    private static final String KEY_PREFS_FIRST_LAUNCH = "first_launch";
     private static final String KEY_PREFS_PUSH_ENABLED = "push_enabled";
     private static final String KEY_PREFS_WATCHING_LOCATION = "watching_location";
+    private static final String KEY_PREFS_WATCHING_PROXIMITY = "watching_proximity";
     private final Runnable displayTimeRemainingRunnable = new Runnable() {
         @Override
         public void run() {
@@ -36,12 +39,21 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     };
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor preferencesEditor;
+
     private ToggleButton toggleButtonEnablePush;
     private ToggleButton toggleButtonEnableLocation;
+    private ToggleButton toggleButtonEnableProximity;
     private TextView countDownTimer;
+    private TextView sdkInformation;
+    private TextView apiInformation;
+    private TextView psInformation;
+    private LinearLayout proximityLayout;
+    private LinearLayout locationLayout;
+
     private boolean isPushEnabled;
     private long alarmTime;
     private boolean isWatchingLocation;
+    private boolean isWatchingProximity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +73,19 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
          */
         isPushEnabled = sharedPreferences.getBoolean(KEY_PREFS_PUSH_ENABLED, true);
         isWatchingLocation = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_LOCATION, false);
+        isWatchingProximity = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_PROXIMITY, false);
 
         /*
             Our countdown timer view.  Shows the seconds until the middle tier updates are
             propagated to the Marketing Cloud servers.
          */
         countDownTimer = (TextView) findViewById(R.id.tv_countdown_timer);
+        sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
+        apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
+        psInformation = (TextView) findViewById(R.id.tv_psInfo);
+
+        locationLayout = (LinearLayout) findViewById(R.id.layout_location);
+        proximityLayout = (LinearLayout) findViewById(R.id.layout_proximity);
 
         /*
             Our pushEnabled() toggle button.  Set its state based off the preferences and create
@@ -99,7 +118,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             Only display the LOCATION toggle if Location is enabled in readyAimFire();
          */
         if (HelloWorldApplication.LOCATION_ENABLED) {
-            LinearLayout locationLayout = (LinearLayout) findViewById(R.id.layout_location);
             locationLayout.setVisibility(View.VISIBLE);
             toggleButtonEnableLocation = (ToggleButton) findViewById(R.id.toggle_enableLocation);
             toggleButtonEnableLocation.setChecked(isWatchingLocation);
@@ -115,9 +133,46 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                         } else {
                             Log.i(TAG, "Not watching location.");
                             ETLocationManager.locationManager().stopWatchingLocation();
+                            if (ETLocationManager.locationManager().isWatchingProximity()) {
+                                ETLocationManager.locationManager().stopWatchingProximity();
+                                toggleButtonEnableProximity.setChecked(isWatchingLocation);
+                                preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
+                            }
                         }
                         ((ToggleButton) v).setChecked(isWatchingLocation);
+                        toggleButtonEnableProximity.setEnabled(isWatchingLocation);
                         preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
+                    } catch (ETException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                    }
+                }
+            });
+        }
+
+        /*
+            Only display the PROXIMITY toggle if Location is enabled in readyAimFire() and we're
+            watching Location.
+         */
+        if (HelloWorldApplication.LOCATION_ENABLED) {
+            proximityLayout.setVisibility(View.VISIBLE);
+            toggleButtonEnableProximity = (ToggleButton) findViewById(R.id.toggle_enableProximity);
+            toggleButtonEnableProximity.setEnabled(isWatchingLocation);
+            toggleButtonEnableProximity.setChecked(isWatchingLocation);
+            toggleButtonEnableProximity.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleButtonEnableProximity.toggle();
+                    isWatchingProximity = !isWatchingProximity;
+                    try {
+                        if (isWatchingLocation) {
+                            Log.i(TAG, "Watching location.");
+                            ETLocationManager.locationManager().startWatchingLocation();
+                        } else {
+                            Log.i(TAG, "Not watching location.");
+                            ETLocationManager.locationManager().stopWatchingLocation();
+                        }
+                        ((ToggleButton) v).setChecked(isWatchingProximity);
+                        preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingProximity).apply();
                     } catch (ETException e) {
                         Log.e(TAG, e.getMessage(), e);
                     }
@@ -129,16 +184,16 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             /*
                 We must call enablePush() at least once for the application.
              */
-            if (sharedPreferences.getBoolean(KEY_FIRST_LAUNCH, true) || true) {
+            if (sharedPreferences.getBoolean(KEY_PREFS_FIRST_LAUNCH, true) || true) {
                 // forcing the enablePush() for v3.4.x
-                Log.i(TAG, String.format("%1$s is true.", KEY_FIRST_LAUNCH));
+                Log.i(TAG, String.format("%1$s is true.", KEY_PREFS_FIRST_LAUNCH));
                 ETPush.pushManager().enablePush();
                 /*
                     Set this after the call to enablePush() so we don't prematurely record that
                     we've made it past our first_launch.
                  */
-                preferencesEditor.putBoolean(KEY_FIRST_LAUNCH, false).apply();
-                Log.i(TAG, String.format("Updated %1$s to false", KEY_FIRST_LAUNCH));
+                preferencesEditor.putBoolean(KEY_PREFS_FIRST_LAUNCH, false).apply();
+                Log.i(TAG, String.format("Updated %1$s to false", KEY_PREFS_FIRST_LAUNCH));
             }
 
             /*
@@ -183,6 +238,11 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         } catch (ETException e) {
             Log.e(TAG, e.getMessage(), e);
         }
+
+        sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.ETPushSDKVersionString));
+        apiInformation.setText(String.format("Android API %1$s (v%2$s) %3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
+        psInformation.setText(String.format("Google Play Services v%1$s", getResources().getInteger(R.integer.google_play_services_version)));
+
     }
 
     /*

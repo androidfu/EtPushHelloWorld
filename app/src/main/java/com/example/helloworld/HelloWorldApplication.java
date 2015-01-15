@@ -25,7 +25,7 @@ public class HelloWorldApplication extends Application {
     public static final String TAG = HelloWorldApplication.class.getSimpleName();
 
     // Enabling location here also triggers work in our Activity that must be done.
-    public static final boolean LOCATION_ENABLED = false;
+    public static final boolean LOCATION_ENABLED = true;
     public static final boolean ANALYTICS_ENABLED = true;
     public static final boolean CLOUD_PAGES_ENABLED = false;
     public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 15; // 15 min.

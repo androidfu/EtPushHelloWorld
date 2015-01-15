@@ -68,6 +68,34 @@
                 android:textOn="@string/togglebtn_enable_location" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/layout_proximity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="1">
+
+
+            <TextView
+                android:id="@+id/tv_proximityHeader"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0.7"
+                android:text="@string/label_proximity"
+                android:textSize="28sp" />
+
+
+            <ToggleButton
+                android:id="@+id/toggle_enableProximity"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:textOff="@string/togglebtn_disable_proximity"
+                android:textOn="@string/togglebtn_enable_proximity" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <TextView
@@ -78,5 +106,35 @@
         android:gravity="center"
         android:textSize="24sp"
         tools:text="Changes Propagated In\n900 seconds" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_sdkInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="JB4A SDK v1.2.3-1230" />
+
+        <TextView
+            android:id="@+id/tv_apiInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="Android API 21 (Lollipop)" />
+
+        <TextView
+            android:id="@+id/tv_psInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="Google Play Services v6.5.87" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>
