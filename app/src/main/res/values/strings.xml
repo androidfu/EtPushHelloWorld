@@ -4,7 +4,7 @@
     <string name="app_name">Hello World</string>
 
     <string name="btn_cancel">Cancel</string>
-    <string name="btn_enable_bluetooth">Enable Bluetooth</string>
+    <string name="btn_enable_bluetooth">Enable</string>
 
     <string name="countdown_timer_text">Changes Propagated In\n%1$d %2$s</string>
 
@@ -13,6 +13,7 @@
 
     <string name="label_location">LOCATION</string>
     <string name="label_push">PUSH</string>
+    <string name="label_proximity">PROXIMITY</string>
 
     <string name="no_pending_alarms">No Pending Alarms</string>
 
@@ -20,11 +21,10 @@
     <string name="notification_body">Update sent at %1$s has been propagated.</string>
 
     <string name="togglebtn_disable_location">Not Watching</string>
+    <string name="togglebtn_disable_proximity">Not Watching</string>
     <string name="togglebtn_disable_push">Disabled</string>
     <string name="togglebtn_enable_location">Watching</string>
-    <string name="togglebtn_enable_push">Enabled</string>
-    <string name="label_proximity">PROXIMITY</string>
-    <string name="togglebtn_disable_proximity">Not Watching</string>
     <string name="togglebtn_enable_proximity">Watching</string>
+    <string name="togglebtn_enable_push">Enabled</string>
 
 </resources>

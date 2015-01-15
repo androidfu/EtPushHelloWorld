@@ -155,7 +155,6 @@ public class HelloWorldApplication extends Application {
         okToCheckMiddleTier = proposedCheckTime;
         Log.v(TAG, String.format("Setting an alarm for %3$dms from %1$d (alarm time: %2$d)", System.currentTimeMillis(), okToCheckMiddleTier, okToCheckMiddleTier - System.currentTimeMillis()));
         Intent intent = new Intent(INTENT_ACTION_STRING);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Bundle bundle = new Bundle();
         bundle.putSerializable(EXTRAS_REGISTRATION_EVENT, event);
         intent.putExtras(bundle);

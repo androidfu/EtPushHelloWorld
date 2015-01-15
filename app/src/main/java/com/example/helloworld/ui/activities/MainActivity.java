@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         alarmTime = sharedPreferences.getLong(HelloWorldApplication.KEY_PREFS_ALARM_TIME, 0);
 
         /*
-            Keep track of the last user pushEnabled() state.
+            Get the last saved user state.
          */
         isPushEnabled = sharedPreferences.getBoolean(KEY_PREFS_PUSH_ENABLED, true);
         isWatchingLocation = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_LOCATION, false);
@@ -75,16 +75,18 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             propagated to the Marketing Cloud servers.
          */
         countDownTimer = (TextView) findViewById(R.id.tv_countdown_timer);
-        TextView sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
-        TextView apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
-        TextView psInformation = (TextView) findViewById(R.id.tv_psInfo);
-
-        LinearLayout locationLayout = (LinearLayout) findViewById(R.id.layout_location);
-        LinearLayout proximityLayout = (LinearLayout) findViewById(R.id.layout_proximity);
 
         /*
-            Our pushEnabled() toggle button.  Set its state based off the preferences and create
-            a clicklistener.  Be sure to update the user's selected state and store it.
+            Handle the proximity toggle button a little differently than the location button since
+            we need to update its enabled state based off the availability of Bluetooth in addition
+            to whether or not we're watching location.
+         */
+        toggleButtonEnableProximity = (ToggleButton) findViewById(R.id.toggle_enableProximity);
+
+        /*
+            Our toggle buttons.  Set their state based off the preferences and create
+            a click listener.  Be sure to update the user's selected state and store it when it
+            changes.
          */
         toggleButtonEnablePush = (ToggleButton) findViewById(R.id.toggle_enablePush);
         toggleButtonEnablePush.setChecked(isPushEnabled);
@@ -113,6 +115,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             Only display the LOCATION toggle if Location is enabled in readyAimFire();
          */
         if (HelloWorldApplication.LOCATION_ENABLED) {
+            LinearLayout locationLayout = (LinearLayout) findViewById(R.id.layout_location);
             locationLayout.setVisibility(View.VISIBLE);
             toggleButtonEnableLocation = (ToggleButton) findViewById(R.id.toggle_enableLocation);
             toggleButtonEnableLocation.setChecked(isWatchingLocation);
@@ -131,8 +134,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             watching Location.
          */
         if (HelloWorldApplication.LOCATION_ENABLED) {
+            LinearLayout proximityLayout = (LinearLayout) findViewById(R.id.layout_proximity);
             proximityLayout.setVisibility(View.VISIBLE);
-            toggleButtonEnableProximity = (ToggleButton) findViewById(R.id.toggle_enableProximity);
             toggleButtonEnableProximity.setEnabled(isWatchingLocation && bluetoothAvailable);
             toggleButtonEnableProximity.setChecked(isWatchingProximity);
             toggleButtonEnableProximity.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +194,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 Add First & Last Name Attributes & a Subscriber Key
              */
             Log.i(TAG, "Adding attributes.");
-            ETPush.pushManager().addAttribute("FirstName", "Hello");
+            ETPush.pushManager().addAttribute("FirstName", "EtPushHelloWorld");
             ETPush.pushManager().addAttribute("LastName", getString(R.string.gcm_sender_id));
             Log.i(TAG, "Adding subscriber key.");
             ETPush.pushManager().setSubscriberKey("bmote@exacttarget.com");
@@ -208,10 +211,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             Log.e(TAG, e.getMessage(), e);
         }
 
+        TextView sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
         sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.ETPushSDKVersionString));
-        apiInformation.setText(String.format("Android API %1$s (v%2$s)\n%3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
-        psInformation.setText(String.format("Google Play Services v%1$s", getResources().getInteger(R.integer.google_play_services_version)));
 
+        TextView apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
+        apiInformation.setText(String.format("Android API %1$s (v%2$s)\n%3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
+
+        TextView psInformation = (TextView) findViewById(R.id.tv_psInfo);
+        psInformation.setText(String.format("Google Play Services v%1$s", getResources().getInteger(R.integer.google_play_services_version)));
     }
 
     private void toggleProximity(boolean watchProximity) {
@@ -344,9 +351,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     public void toggleScreenWake(boolean keepAwake) {
         if (keepAwake) {
-
+            this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         } else {
-            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
     }
