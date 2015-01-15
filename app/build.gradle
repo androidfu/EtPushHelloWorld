@@ -41,9 +41,9 @@ dependencies {
     //compile "com.exacttarget.etpushsdk:etsdk:3.5.0.3504@aar"
 
     // Google Play Services for GCM (it's in base) and Location
-    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.google.android.gms:play-services-location:6.5.87'
     // Google's Support v4 for Notification compatibility
-    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:support-v4:21.0.3'
 
     // 3rd Party Libraries Req. for SDK integration
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.4' // previously 2.4.3
