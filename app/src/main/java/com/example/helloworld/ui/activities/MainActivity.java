@@ -18,7 +18,6 @@ import android.widget.ToggleButton;
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETLocationManager;
 import com.exacttarget.etpushsdk.ETPush;
-import com.example.helloworld.BuildConfig;
 import com.example.helloworld.HelloWorldApplication;
 import com.example.helloworld.R;
 import com.radiusnetworks.ibeacon.BleNotAvailableException;
@@ -44,16 +43,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private ToggleButton toggleButtonEnableLocation;
     private ToggleButton toggleButtonEnableProximity;
     private TextView countDownTimer;
-    private TextView sdkInformation;
-    private TextView apiInformation;
-    private TextView psInformation;
-    private LinearLayout proximityLayout;
-    private LinearLayout locationLayout;
 
     private boolean isPushEnabled;
     private long alarmTime;
     private boolean isWatchingLocation;
     private boolean isWatchingProximity;
+    private boolean bluetoothAvailable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +75,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             propagated to the Marketing Cloud servers.
          */
         countDownTimer = (TextView) findViewById(R.id.tv_countdown_timer);
-        sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
-        apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
-        psInformation = (TextView) findViewById(R.id.tv_psInfo);
+        TextView sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
+        TextView apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
+        TextView psInformation = (TextView) findViewById(R.id.tv_psInfo);
 
-        locationLayout = (LinearLayout) findViewById(R.id.layout_location);
-        proximityLayout = (LinearLayout) findViewById(R.id.layout_proximity);
+        LinearLayout locationLayout = (LinearLayout) findViewById(R.id.layout_location);
+        LinearLayout proximityLayout = (LinearLayout) findViewById(R.id.layout_proximity);
 
         /*
             Our pushEnabled() toggle button.  Set its state based off the preferences and create
@@ -126,25 +121,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 public void onClick(View v) {
                     toggleButtonEnableLocation.toggle();
                     isWatchingLocation = !isWatchingLocation;
-                    try {
-                        if (isWatchingLocation) {
-                            Log.i(TAG, "Watching location.");
-                            ETLocationManager.locationManager().startWatchingLocation();
-                        } else {
-                            Log.i(TAG, "Not watching location.");
-                            ETLocationManager.locationManager().stopWatchingLocation();
-                            if (ETLocationManager.locationManager().isWatchingProximity()) {
-                                ETLocationManager.locationManager().stopWatchingProximity();
-                                toggleButtonEnableProximity.setChecked(isWatchingLocation);
-                                preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
-                            }
-                        }
-                        ((ToggleButton) v).setChecked(isWatchingLocation);
-                        toggleButtonEnableProximity.setEnabled(isWatchingLocation);
-                        preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
-                    } catch (ETException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                    }
+                    toggleLocation(isWatchingLocation);
                 }
             });
         }
@@ -156,26 +133,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         if (HelloWorldApplication.LOCATION_ENABLED) {
             proximityLayout.setVisibility(View.VISIBLE);
             toggleButtonEnableProximity = (ToggleButton) findViewById(R.id.toggle_enableProximity);
-            toggleButtonEnableProximity.setEnabled(isWatchingLocation);
-            toggleButtonEnableProximity.setChecked(isWatchingLocation);
+            toggleButtonEnableProximity.setEnabled(isWatchingLocation && bluetoothAvailable);
+            toggleButtonEnableProximity.setChecked(isWatchingProximity);
             toggleButtonEnableProximity.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     toggleButtonEnableProximity.toggle();
                     isWatchingProximity = !isWatchingProximity;
-                    try {
-                        if (isWatchingLocation) {
-                            Log.i(TAG, "Watching location.");
-                            ETLocationManager.locationManager().startWatchingLocation();
-                        } else {
-                            Log.i(TAG, "Not watching location.");
-                            ETLocationManager.locationManager().stopWatchingLocation();
-                        }
-                        ((ToggleButton) v).setChecked(isWatchingProximity);
-                        preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingProximity).apply();
-                    } catch (ETException e) {
-                        Log.e(TAG, e.getMessage(), e);
-                    }
+                    toggleProximity(isWatchingProximity);
                 }
             });
         }
@@ -210,10 +175,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                     if (!ETLocationManager.locationManager().startWatchingProximity()) {
                         Log.i(TAG, "BLE is available.");
                         promptForBluetoothSettings();
+                    } else {
+                        Log.i(TAG, "BLE is enabled.");
+                        bluetoothAvailable = true;
+                        toggleButtonEnableProximity.setEnabled(isWatchingLocation);
                     }
                 } catch (BleNotAvailableException e) {
                     Log.w(TAG, "BLE is not available on this device");
-                    //sharedPreferences.edit().putBoolean("pref_proximity", false).commit();
+                    bluetoothAvailable = false;
                     ETLocationManager.locationManager().stopWatchingProximity();
                 }
             }
@@ -240,9 +209,50 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
 
         sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.ETPushSDKVersionString));
-        apiInformation.setText(String.format("Android API %1$s (v%2$s) %3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
+        apiInformation.setText(String.format("Android API %1$s (v%2$s)\n%3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
         psInformation.setText(String.format("Google Play Services v%1$s", getResources().getInteger(R.integer.google_play_services_version)));
 
+    }
+
+    private void toggleProximity(boolean watchProximity) {
+        try {
+            if (watchProximity) {
+                Log.i(TAG, "Watching location.");
+                ETLocationManager.locationManager().startWatchingProximity();
+            } else {
+                Log.i(TAG, "Not watching location.");
+                ETLocationManager.locationManager().stopWatchingProximity();
+            }
+            toggleButtonEnableProximity.setChecked(watchProximity);
+            toggleButtonEnableProximity.setEnabled(isWatchingLocation && bluetoothAvailable);
+            /*
+                We want the state of the user clicks, not the state of a toggle based on location
+                so we use our field to set our preference rather than the watchProximity argument
+                passed in.  This allows us to return the proximity state to its pervious setting
+                when the user re-enables location.
+             */
+            preferencesEditor.putBoolean(KEY_PREFS_WATCHING_PROXIMITY, isWatchingProximity).apply();
+        } catch (ETException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void toggleLocation(boolean watchLocation) {
+        try {
+            if (watchLocation) {
+                Log.i(TAG, "Watching location.");
+                ETLocationManager.locationManager().startWatchingLocation();
+                toggleProximity(isWatchingProximity);
+            } else {
+                Log.i(TAG, "Not watching location.");
+                ETLocationManager.locationManager().stopWatchingLocation();
+                toggleProximity(watchLocation);
+            }
+            toggleButtonEnableLocation.setChecked(watchLocation);
+            preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
+        } catch (ETException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 
     /*
@@ -252,11 +262,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private void displayTimeRemaining() {
         long millisecondsRemaining = alarmTime - System.currentTimeMillis();
         int secondsRemaining = (int) (millisecondsRemaining / DateUtils.SECOND_IN_MILLIS);
+        countDownTimer.removeCallbacks(displayTimeRemainingRunnable);
         if (secondsRemaining > 0) {
             countDownTimer.setText(String.format(getString(R.string.countdown_timer_text), secondsRemaining, getResources().getQuantityString(R.plurals.seconds, secondsRemaining)));
             countDownTimer.postDelayed(displayTimeRemainingRunnable, DateUtils.SECOND_IN_MILLIS);
+            toggleScreenWake(true);
         } else {
             countDownTimer.setText(getString(R.string.no_pending_alarms));
+            toggleScreenWake(false);
         }
     }
 
@@ -268,7 +281,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             JB4A SDK.
          */
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         displayTimeRemaining();
     }
 
@@ -283,7 +295,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             JB4A SDK.
          */
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        toggleScreenWake(false);
         super.onPause();
     }
 
@@ -303,6 +315,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                         if (!mBluetoothAdapter.isEnabled()) {
                             mBluetoothAdapter.enable();
+                            bluetoothAvailable = true;
+                            toggleButtonEnableProximity.setEnabled(isWatchingLocation);
                         }
                         try {
                             ETLocationManager.locationManager().startWatchingProximity();
@@ -326,5 +340,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             alarmTime = sharedPreferences.getLong(HelloWorldApplication.KEY_PREFS_ALARM_TIME, 0);
             displayTimeRemaining();
         }
+    }
+
+    public void toggleScreenWake(boolean keepAwake) {
+        if (keepAwake) {
+
+        } else {
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+
     }
 }

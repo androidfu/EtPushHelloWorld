@@ -19,7 +19,6 @@
             android:orientation="horizontal"
             android:weightSum="1">
 
-
             <TextView
                 android:id="@+id/tv_pushHeader"
                 android:layout_width="0dip"
@@ -28,7 +27,6 @@
                 android:layout_weight="0.7"
                 android:text="@string/label_push"
                 android:textSize="28sp" />
-
 
             <ToggleButton
                 android:id="@+id/toggle_enablePush"
@@ -48,7 +46,6 @@
             android:visibility="gone"
             android:weightSum="1">
 
-
             <TextView
                 android:id="@+id/tv_locationHeader"
                 android:layout_width="0dip"
@@ -57,7 +54,6 @@
                 android:layout_weight="0.7"
                 android:text="@string/label_location"
                 android:textSize="28sp" />
-
 
             <ToggleButton
                 android:id="@+id/toggle_enableLocation"
@@ -76,7 +72,6 @@
             android:visibility="gone"
             android:weightSum="1">
 
-
             <TextView
                 android:id="@+id/tv_proximityHeader"
                 android:layout_width="0dip"
@@ -85,7 +80,6 @@
                 android:layout_weight="0.7"
                 android:text="@string/label_proximity"
                 android:textSize="28sp" />
-
 
             <ToggleButton
                 android:id="@+id/toggle_enableProximity"
