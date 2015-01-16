@@ -11,3 +11,7 @@ Notes
 * App starts with location and proximity disabled.
 * Proximity button is only enabled if location is enabled *and* bluetooth is available and enabled on the device.
 * Any change that results in a RegistrationEvent will kick off a 15 min. timer.
+
+Screenshot(s)
+=============
+![Alt Hello World](/2015-01-15.jpg?raw=true "EtPushHelloWorld Home Screen")
