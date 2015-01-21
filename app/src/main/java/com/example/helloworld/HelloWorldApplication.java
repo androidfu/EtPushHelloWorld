@@ -88,7 +88,7 @@ public class HelloWorldApplication extends Application {
                 Log.i(TAG, String.format("%1$s is true.", KEY_PREFS_FIRST_LAUNCH));
                 ETPush.pushManager().enablePush();
                 /*
-                    Set this after the call to enablePush()/disablePush() so we don't prematurely
+                    Set this after the call to enablePush() so we don't prematurely
                     record that we've made it past our first_launch.
                  */
                 preferencesEditor.putBoolean(KEY_PREFS_FIRST_LAUNCH, false).apply();

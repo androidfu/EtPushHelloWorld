@@ -202,13 +202,20 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         psInformation.setText(String.format("Google Play Services v%1$s", getResources().getInteger(R.integer.google_play_services_version)));
     }
 
+    /**
+     * There's work that must be done when enabling/disabling Proximity.  Also, proximity is
+     * dependent on the state of location monitoring toggle it's monitoring based on location, but
+     * store the preference based on user selection.
+     *
+     * @param watchProximity true if you wish to watch for proximity (Beacon) changes
+     */
     private void toggleProximity(boolean watchProximity) {
         try {
             if (watchProximity) {
-                Log.i(TAG, "Watching location.");
+                Log.i(TAG, "Watching Proximity");
                 ETLocationManager.locationManager().startWatchingProximity();
             } else {
-                Log.i(TAG, "Not watching location.");
+                Log.i(TAG, "Not Watching Proximity");
                 ETLocationManager.locationManager().stopWatchingProximity();
             }
             toggleButtonEnableProximity.setChecked(watchProximity);
@@ -216,7 +223,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             /*
                 We want the state of the user clicks, not the state of a toggle based on location
                 so we use our field to set our preference rather than the watchProximity argument
-                passed in.  This allows us to return the proximity state to its pervious setting
+                passed in.  This allows us to return the proximity state to its previous setting
                 when the user re-enables location.
              */
             preferencesEditor.putBoolean(KEY_PREFS_WATCHING_PROXIMITY, isWatchingProximity).apply();
@@ -225,16 +232,21 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
     }
 
+    /**
+     * There's work that must be done when enabling/disabling Location.  Bundle all that work here.
+     *
+     * @param watchLocation true if you wish to watch for location changes
+     */
     private void toggleLocation(boolean watchLocation) {
         try {
             if (watchLocation) {
-                Log.i(TAG, "Watching location.");
+                Log.i(TAG, "Watching Location");
                 ETLocationManager.locationManager().startWatchingLocation();
                 toggleProximity(isWatchingProximity);
             } else {
-                Log.i(TAG, "Not watching location.");
+                Log.i(TAG, "Not Watching Location");
                 ETLocationManager.locationManager().stopWatchingLocation();
-                toggleProximity(watchLocation);
+                toggleProximity(false);
             }
             toggleButtonEnableLocation.setChecked(watchLocation);
             preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
@@ -243,9 +255,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
     }
 
-    /*
-        Calculate the number of seconds remaining and update our view.  Also, call our runnable
-        1 sec. from now which will return us here ;)
+    /**
+     * Calculate the number of seconds remaining and update our view.  Also, call our runnable
+     * 1 sec. from now which will return us here ;)
      */
     private void displayTimeRemaining() {
         long millisecondsRemaining = alarmTime - System.currentTimeMillis();
@@ -330,6 +342,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
     }
 
+    /**
+     * Toggles the screen wake.  Currently being used to keep the screen on if a timer is running.
+     */
     public void toggleScreenWake(boolean keepAwake) {
         if (keepAwake) {
             this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
