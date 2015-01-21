@@ -26,7 +26,6 @@ import com.radiusnetworks.ibeacon.BleNotAvailableException;
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String KEY_PREFS_FIRST_LAUNCH = "first_launch";
     private static final String KEY_PREFS_PUSH_ENABLED = "push_enabled";
     private static final String KEY_PREFS_WATCHING_LOCATION = "watching_location";
     private static final String KEY_PREFS_WATCHING_PROXIMITY = "watching_proximity";
@@ -150,21 +149,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
         try {
             /*
-                We must call enablePush() at least once for the application.
-             */
-            if (sharedPreferences.getBoolean(KEY_PREFS_FIRST_LAUNCH, true) || true) {
-                // forcing the enablePush() for v3.4.x
-                Log.i(TAG, String.format("%1$s is true.", KEY_PREFS_FIRST_LAUNCH));
-                ETPush.pushManager().enablePush();
-                /*
-                    Set this after the call to enablePush() so we don't prematurely record that
-                    we've made it past our first_launch.
-                 */
-                preferencesEditor.putBoolean(KEY_PREFS_FIRST_LAUNCH, false).apply();
-                Log.i(TAG, String.format("Updated %1$s to false", KEY_PREFS_FIRST_LAUNCH));
-            }
-
-            /*
                 If we have Location enabled then we must start/stop watching as the default state
                 at least once.
              */
@@ -202,9 +186,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             if (isPushEnabled) {
                 Log.i(TAG, "Push is enabled.");
                 ETPush.pushManager().enablePush();
-            } else {
-                Log.i(TAG, "Push is disabled.");
-                ETPush.pushManager().disablePush();
             }
 
         } catch (ETException e) {

@@ -32,10 +32,13 @@ public class HelloWorldApplication extends Application {
     public static final String EXTRAS_REGISTRATION_EVENT = "event";
     public static final String HELLO_WORLD_PREFERENCES = "hello_world_preferences";
     public static final String KEY_PREFS_ALARM_TIME = "mt_alarm_time";
+    public static final String KEY_PREFS_FIRST_LAUNCH = "first_launch";
     public static final String INTENT_ACTION_STRING = "mt_propagation_alarm";
 
     public static String VERSION_NAME;
     public static int VERSION_CODE;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor preferencesEditor;
 
     private static long okToCheckMiddleTier;
 
@@ -45,6 +48,9 @@ public class HelloWorldApplication extends Application {
 
         VERSION_NAME = getAppVersionName();
         VERSION_CODE = getAppVersionCode();
+
+        sharedPreferences = getSharedPreferences(HELLO_WORLD_PREFERENCES, MODE_PRIVATE);
+        preferencesEditor = sharedPreferences.edit();
 
         /*
             A good practice is to register your application to listen for events posted to a private
@@ -72,6 +78,23 @@ public class HelloWorldApplication extends Application {
              */
             ETPush pushManager = ETPush.pushManager();
             pushManager.addTag(VERSION_NAME);
+
+            /*
+                We must call enablePush() or disablePush() at least once for the application to set
+                its initial state.  Also, you must call enablePush() to update your registration
+                should you add Tags, Attributes, Subscriber Key, etc.
+             */
+            if (sharedPreferences.getBoolean(KEY_PREFS_FIRST_LAUNCH, true)) {
+                Log.i(TAG, String.format("%1$s is true.", KEY_PREFS_FIRST_LAUNCH));
+                ETPush.pushManager().enablePush();
+                /*
+                    Set this after the call to enablePush()/disablePush() so we don't prematurely
+                    record that we've made it past our first_launch.
+                 */
+                preferencesEditor.putBoolean(KEY_PREFS_FIRST_LAUNCH, false).apply();
+                Log.i(TAG, String.format("Updated %1$s to false", KEY_PREFS_FIRST_LAUNCH));
+            }
+
         } catch (ETException e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -171,7 +194,6 @@ public class HelloWorldApplication extends Application {
                 pendingIntent
         );
 
-        SharedPreferences.Editor preferencesEditor = getSharedPreferences(HELLO_WORLD_PREFERENCES, MODE_PRIVATE).edit();
         preferencesEditor.putLong(KEY_PREFS_ALARM_TIME, okToCheckMiddleTier).apply();
     }
 }
