@@ -16,6 +16,9 @@
 #   public *;
 #}
 
+-dontobfuscate
+-dontwarn
+
 # To prevent ProGuard from stripping away required classes, add the following lines in the <project_directory>/proguard-project.txt file:
 -keep class * extends java.util.ListResourceBundle {
     protected Object[][] getContents();

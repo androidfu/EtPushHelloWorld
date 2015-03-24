@@ -193,7 +193,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
 
         TextView sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
-        sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.ETPushSDKVersionString));
+        sdkInformation.setText(String.format("JB4A SDK v%1$s", "unknown" /* ETPush.ETPushSDKVersionString */));
 
         TextView apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
         apiInformation.setText(String.format("Android API %1$s (v%2$s)\n%3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));

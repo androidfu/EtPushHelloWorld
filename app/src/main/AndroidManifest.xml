@@ -59,8 +59,16 @@
         -->
         <!--
             Introduced in 3.5.x
-            <receiver android:name="com.exacttarget.etpushsdk.ETPackageReplacedReceiver" />
         -->
+        <receiver android:name="com.exacttarget.etpushsdk.ETPackageReplacedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+                <data android:scheme="com.example.helloworld" />
+            </intent-filter>
+        </receiver>
         <!--
             Required by Location Services
         -->

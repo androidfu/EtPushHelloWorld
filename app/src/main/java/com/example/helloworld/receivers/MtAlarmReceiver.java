@@ -12,8 +12,8 @@ import android.util.Log;
 
 import com.exacttarget.etpushsdk.event.RegistrationEvent;
 import com.example.helloworld.HelloWorldApplication;
-import com.example.helloworld.ui.activities.MainActivity;
 import com.example.helloworld.R;
+import com.example.helloworld.ui.activities.MainActivity;
 
 import java.util.Date;
 
@@ -41,12 +41,12 @@ public class MtAlarmReceiver extends BroadcastReceiver {
         String eventTimeAsString = android.text.format.DateFormat.format("yyyy-MM-dd kk:mm:ss", date).toString();
 
         NotificationCompat.Builder builder =
-            new NotificationCompat.Builder(context)
-                    .setAutoCancel(true)
-                    .setDefaults(Notification.DEFAULT_ALL)
-                    .setSmallIcon(R.drawable.ic_stat_helloworld)
-                    .setContentTitle(context.getString(R.string.notification_title))
-                    .setContentText(String.format(context.getString(R.string.notification_body), eventTimeAsString));
+                new NotificationCompat.Builder(context)
+                        .setAutoCancel(true)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setSmallIcon(R.drawable.ic_stat_helloworld)
+                        .setContentTitle(context.getString(R.string.notification_title))
+                        .setContentText(String.format(context.getString(R.string.notification_body), eventTimeAsString));
 
         Intent notificationIntent = new Intent(context, MainActivity.class);
         /*

@@ -27,7 +27,7 @@ public class HelloWorldApplication extends Application {
     // Enabling location here also triggers work in our Activity that must be done.
     public static final boolean LOCATION_ENABLED = true;
     public static final boolean ANALYTICS_ENABLED = true;
-    public static final boolean CLOUD_PAGES_ENABLED = false;
+    public static final boolean CLOUD_PAGES_ENABLED = true;
     public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 15; // 15 min.
     public static final String EXTRAS_REGISTRATION_EVENT = "event";
     public static final String HELLO_WORLD_PREFERENCES = "hello_world_preferences";
@@ -37,10 +37,9 @@ public class HelloWorldApplication extends Application {
 
     public static String VERSION_NAME;
     public static int VERSION_CODE;
+    private static long okToCheckMiddleTier;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor preferencesEditor;
-
-    private static long okToCheckMiddleTier;
 
     @Override
     public void onCreate() {
@@ -68,6 +67,7 @@ public class HelloWorldApplication extends Application {
                     getString(R.string.et_app_id),   // TODO Replace with Your App Center Application ID
                     getString(R.string.access_token),               // TODO Replace with Your App Center Access Token
                     getString(R.string.gcm_sender_id),                           // TODO Replace with Your GCM Sender ID
+                    /*"",*/                                       // TODO Replace with Your Encryption Key
                     ANALYTICS_ENABLED,
                     LOCATION_ENABLED,
                     CLOUD_PAGES_ENABLED
@@ -140,8 +140,8 @@ public class HelloWorldApplication extends Application {
             Log.d(TAG, "Device ID:" + event.getDeviceId());
             Log.d(TAG, "Device Token:" + event.getDeviceToken());
             Log.d(TAG, "Subscriber key:" + event.getSubscriberKey());
-            for (Attribute attribute : event.getAttributes()) {
-                Log.d(TAG, "Attribute " + attribute.getKey() + ": [" + attribute.getValue() + "]");
+            for (Object attribute : event.getAttributes()) {
+                Log.d(TAG, "Attribute " + ((Attribute) attribute).getKey() + ": [" + ((Attribute) attribute).getValue() + "]");
             }
             Log.d(TAG, "Tags: " + event.getTags());
             Log.d(TAG, "Language: " + event.getLocale());
