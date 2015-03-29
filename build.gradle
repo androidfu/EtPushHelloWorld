@@ -17,7 +17,7 @@ allprojects {
         jcenter()
         mavenLocal()
         maven {
-            url "http://in6827.et.local:8081/nexus/content/groups/public"
+            url "http://exacttarget.github.io/JB4A-SDK-Android/repository/"
         }
     }
 }
