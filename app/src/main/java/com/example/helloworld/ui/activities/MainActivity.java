@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             Get the last saved user state.
          */
         isPushEnabled = sharedPreferences.getBoolean(KEY_PREFS_PUSH_ENABLED, true);
-        isWatchingLocation = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_LOCATION, false);
+        isWatchingLocation = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_LOCATION, true);
         isWatchingProximity = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_PROXIMITY, false);
 
         /*
