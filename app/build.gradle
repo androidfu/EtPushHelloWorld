@@ -35,16 +35,14 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // ET SDK
-    compile 'com.exacttarget.etpushsdk:etsdk:3.5.0@aar'
+    compile 'com.exacttarget.etpushsdk:etsdk:4.0.4@aar'
 
     // Google Play Services for GCM and Location
-    compile 'com.google.android.gms:play-services:6.1.71'
+    compile 'com.google.android.gms:play-services:7.5.0'
 
     // Google's Support v4 for Notification compatibility
-    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:support-v4:22.2.0'
 
     // 3rd Party Libraries Required for SDK integration
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.0.6'
-    compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'com.radiusnetworks:AndroidIBeaconLibrary:0.7.6'
 }

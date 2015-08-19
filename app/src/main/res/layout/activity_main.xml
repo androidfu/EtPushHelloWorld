@@ -38,58 +38,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layout_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:weightSum="1">
-
-            <TextView
-                android:id="@+id/tv_locationHeader"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0.7"
-                android:text="@string/label_location"
-                android:textSize="28sp" />
-
-            <ToggleButton
-                android:id="@+id/toggle_enableLocation"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:textOff="@string/togglebtn_disable_location"
-                android:textOn="@string/togglebtn_enable_location" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_proximity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:weightSum="1">
-
-            <TextView
-                android:id="@+id/tv_proximityHeader"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0.7"
-                android:text="@string/label_proximity"
-                android:textSize="28sp" />
-
-            <ToggleButton
-                android:id="@+id/toggle_enableProximity"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:textOff="@string/togglebtn_disable_proximity"
-                android:textOn="@string/togglebtn_enable_proximity" />
-        </LinearLayout>
-
     </LinearLayout>
 
     <TextView

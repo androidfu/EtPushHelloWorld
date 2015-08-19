@@ -12,7 +12,6 @@ public class ApplicationTest extends ApplicationTestCase<HelloWorldApplication> 
 
     public void testGCMIdSet() {
         assertEquals(getApplication().ANALYTICS_ENABLED, false);
-        assertEquals(getApplication().LOCATION_ENABLED, false);
         assertEquals(getApplication().CLOUD_PAGES_ENABLED, false);
     }
 

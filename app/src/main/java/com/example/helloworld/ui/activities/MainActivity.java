@@ -27,8 +27,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String KEY_PREFS_PUSH_ENABLED = "push_enabled";
-    private static final String KEY_PREFS_WATCHING_LOCATION = "watching_location";
-    private static final String KEY_PREFS_WATCHING_PROXIMITY = "watching_proximity";
     private final Runnable displayTimeRemainingRunnable = new Runnable() {
         @Override
         public void run() {
@@ -39,17 +37,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private SharedPreferences.Editor preferencesEditor;
 
     private ToggleButton toggleButtonEnablePush;
-    private ToggleButton toggleButtonEnableLocation;
-    private ToggleButton toggleButtonEnableProximity;
     private TextView countDownTimer;
 
     private boolean isPushEnabled;
     private long alarmTime;
-    private boolean isWatchingLocation;
-    private boolean isWatchingProximity;
-    private boolean bluetoothAvailable;
 
-    @Override
+     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -66,21 +59,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             Get the last saved user state.
          */
         isPushEnabled = sharedPreferences.getBoolean(KEY_PREFS_PUSH_ENABLED, true);
-        isWatchingLocation = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_LOCATION, true);
-        isWatchingProximity = sharedPreferences.getBoolean(KEY_PREFS_WATCHING_PROXIMITY, false);
 
         /*
             Our countdown timer view.  Shows the seconds until the middle tier updates are
             propagated to the Marketing Cloud servers.
          */
         countDownTimer = (TextView) findViewById(R.id.tv_countdown_timer);
-
-        /*
-            Handle the proximity toggle button a little differently than the location button since
-            we need to update its enabled state based off the availability of Bluetooth in addition
-            to whether or not we're watching location.
-         */
-        toggleButtonEnableProximity = (ToggleButton) findViewById(R.id.toggle_enableProximity);
 
         /*
             Our toggle buttons.  Set their state based off the preferences and create
@@ -110,70 +94,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             }
         });
 
-        /*
-            Only display the LOCATION toggle if Location is enabled in readyAimFire();
-         */
-        if (HelloWorldApplication.LOCATION_ENABLED) {
-            LinearLayout locationLayout = (LinearLayout) findViewById(R.id.layout_location);
-            locationLayout.setVisibility(View.VISIBLE);
-            toggleButtonEnableLocation = (ToggleButton) findViewById(R.id.toggle_enableLocation);
-            toggleButtonEnableLocation.setChecked(isWatchingLocation);
-            toggleButtonEnableLocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggleButtonEnableLocation.toggle();
-                    isWatchingLocation = !isWatchingLocation;
-                    toggleLocation(isWatchingLocation);
-                }
-            });
-        }
-
-        /*
-            Only display the PROXIMITY toggle if Location is enabled in readyAimFire() and we're
-            watching Location.
-         */
-        if (HelloWorldApplication.LOCATION_ENABLED) {
-            LinearLayout proximityLayout = (LinearLayout) findViewById(R.id.layout_proximity);
-            proximityLayout.setVisibility(View.VISIBLE);
-            toggleButtonEnableProximity.setEnabled(isWatchingLocation && bluetoothAvailable);
-            toggleButtonEnableProximity.setChecked(isWatchingProximity);
-            toggleButtonEnableProximity.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggleButtonEnableProximity.toggle();
-                    isWatchingProximity = !isWatchingProximity;
-                    toggleProximity(isWatchingProximity);
-                }
-            });
-        }
-
         try {
-            /*
-                If we have Location enabled then we must start/stop watching as the default state
-                at least once.
-             */
-            if (HelloWorldApplication.LOCATION_ENABLED) {
-                Log.i(TAG, "Location is enabled.");
-                ETLocationManager.locationManager().startWatchingLocation();
-                /*
-                    If we're watching for location then also watch for beacons if possible.
-                 */
-                try {
-                    if (!ETLocationManager.locationManager().startWatchingProximity()) {
-                        Log.i(TAG, "BLE is available.");
-                        promptForBluetoothSettings();
-                    } else {
-                        Log.i(TAG, "BLE is enabled.");
-                        bluetoothAvailable = true;
-                        toggleButtonEnableProximity.setEnabled(isWatchingLocation);
-                    }
-                } catch (BleNotAvailableException e) {
-                    Log.w(TAG, "BLE is not available on this device");
-                    bluetoothAvailable = false;
-                    ETLocationManager.locationManager().stopWatchingProximity();
-                }
-            }
-
             /*
                 Add First & Last Name Attributes & a Subscriber Key
              */
@@ -193,66 +114,13 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
 
         TextView sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
-        sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.getSDKVersionName(this) /* ETPush.ETPushSDKVersionString in version 2014-08 */));
+        sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.getSdkVersionName() /* ETPush.ETPushSDKVersionString in version 2014-08 */));
 
         TextView apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
         apiInformation.setText(String.format("Android API %1$s (v%2$s)\n%3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
 
         TextView psInformation = (TextView) findViewById(R.id.tv_psInfo);
         psInformation.setText(String.format("Google Play Services v%1$s", getResources().getInteger(R.integer.google_play_services_version)));
-    }
-
-    /**
-     * There's work that must be done when enabling/disabling Proximity.  Also, proximity is
-     * dependent on the state of location monitoring toggle it's monitoring based on location, but
-     * store the preference based on user selection.
-     *
-     * @param watchProximity true if you wish to watch for proximity (Beacon) changes
-     */
-    private void toggleProximity(boolean watchProximity) {
-        try {
-            if (watchProximity) {
-                Log.i(TAG, "Watching Proximity");
-                ETLocationManager.locationManager().startWatchingProximity();
-            } else {
-                Log.i(TAG, "Not Watching Proximity");
-                ETLocationManager.locationManager().stopWatchingProximity();
-            }
-            toggleButtonEnableProximity.setChecked(watchProximity);
-            toggleButtonEnableProximity.setEnabled(isWatchingLocation && bluetoothAvailable);
-            /*
-                We want the state of the user clicks, not the state of a toggle based on location
-                so we use our field to set our preference rather than the watchProximity argument
-                passed in.  This allows us to return the proximity state to its previous setting
-                when the user re-enables location.
-             */
-            preferencesEditor.putBoolean(KEY_PREFS_WATCHING_PROXIMITY, isWatchingProximity).apply();
-        } catch (ETException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * There's work that must be done when enabling/disabling Location.  Bundle all that work here.
-     *
-     * @param watchLocation true if you wish to watch for location changes
-     */
-    private void toggleLocation(boolean watchLocation) {
-        try {
-            if (watchLocation) {
-                Log.i(TAG, "Watching Location");
-                ETLocationManager.locationManager().startWatchingLocation();
-                toggleProximity(isWatchingProximity);
-            } else {
-                Log.i(TAG, "Not Watching Location");
-                ETLocationManager.locationManager().stopWatchingLocation();
-                toggleProximity(false);
-            }
-            toggleButtonEnableLocation.setChecked(watchLocation);
-            preferencesEditor.putBoolean(KEY_PREFS_WATCHING_LOCATION, isWatchingLocation).apply();
-        } catch (ETException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
     }
 
     /**
@@ -297,36 +165,6 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         toggleScreenWake(false);
         super.onPause();
-    }
-
-    /**
-     * Prompt the user to enable BlueTooth on their device if it is not already enabled and update
-     * their LocationManager object to startWatchingProximity().
-     */
-    private void promptForBluetoothSettings() {
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle(getString(R.string.dialog_enable_bluetooth_title))
-                .setMessage(getString(R.string.dialog_enable_bluetooth_message))
-                .setNegativeButton(getString(R.string.btn_cancel), null)
-                .setPositiveButton(getString(R.string.btn_enable_bluetooth), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                        if (!mBluetoothAdapter.isEnabled()) {
-                            mBluetoothAdapter.enable();
-                            bluetoothAvailable = true;
-                            toggleButtonEnableProximity.setEnabled(isWatchingLocation);
-                        }
-                        try {
-                            ETLocationManager.locationManager().startWatchingProximity();
-                        } catch (BleNotAvailableException e) {
-                            Log.e(TAG, e.getMessage(), e);
-                        } catch (ETException e) {
-                            Log.e(TAG, e.getMessage(), e);
-                        }
-                    }
-                }).show();
     }
 
     /*

@@ -13,7 +13,9 @@ import android.util.Log;
 
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETPush;
+import com.exacttarget.etpushsdk.ETPushConfig;
 import com.exacttarget.etpushsdk.data.Attribute;
+import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEvent;
 import com.exacttarget.etpushsdk.event.RegistrationEvent;
 import com.exacttarget.etpushsdk.util.EventBus;
 
@@ -24,11 +26,10 @@ public class HelloWorldApplication extends Application {
 
     public static final String TAG = HelloWorldApplication.class.getSimpleName();
 
-    // Enabling location here also triggers work in our Activity that must be done.
-    public static final boolean LOCATION_ENABLED = true;
     public static final boolean ANALYTICS_ENABLED = true;
     public static final boolean CLOUD_PAGES_ENABLED = true;
-    public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 15; // 15 min.
+    public static final boolean WAMA_ENABLED = true;
+    public static final long MIDDLE_TIER_PROPAGATION_MIN_DELAY = DateUtils.MINUTE_IN_MILLIS * 5; // 5 min.
     public static final String EXTRAS_REGISTRATION_EVENT = "event";
     public static final String HELLO_WORLD_PREFERENCES = "hello_world_preferences";
     public static final String KEY_PREFS_ALARM_TIME = "mt_alarm_time";
@@ -58,43 +59,17 @@ public class HelloWorldApplication extends Application {
         EventBus.getDefault().register(this);
 
         try {
-            // Set the log level based on the build type.
-            ETPush.setLogLevel(BuildConfig.DEBUG ? Log.VERBOSE : Log.ERROR);
-
             // Register to receive push notifications.
-            ETPush.readyAimFire(
-                    this,
-                    getString(R.string.et_app_id),   // TODO Replace with Your App Center Application ID
-                    getString(R.string.access_token),               // TODO Replace with Your App Center Access Token
-                    getString(R.string.gcm_sender_id),                           // TODO Replace with Your GCM Sender ID
-                    /*"",*/                                       // TODO Replace with Your Encryption Key
-                    ANALYTICS_ENABLED,
-                    LOCATION_ENABLED,
-                    CLOUD_PAGES_ENABLED
+            ETPush.readyAimFire(new ETPushConfig.Builder(this)
+                            .setEtAppId(getString(R.string.et_app_id))
+                            .setAccessToken(getString(R.string.access_token))
+                            .setGcmSenderId(getString(R.string.gcm_sender_id))
+                            .setLogLevel(BuildConfig.DEBUG ? Log.VERBOSE : Log.ERROR)
+                            .setAnalyticsEnabled(ANALYTICS_ENABLED)
+                            .setPiAnalyticsEnabled(WAMA_ENABLED)
+                            .setCloudPagesEnabled(CLOUD_PAGES_ENABLED)
+                            .build()
             );
-            /*
-                A good practice is to add the application's version name as a tag that can later
-                be used to target push notifications to specific application versions.
-             */
-            ETPush pushManager = ETPush.pushManager();
-            pushManager.addTag(VERSION_NAME);
-
-            /*
-                We must call enablePush() or disablePush() at least once for the application to set
-                its initial state.  Also, you must call enablePush() to update your registration
-                should you add Tags, Attributes, Subscriber Key, etc.
-             */
-            if (sharedPreferences.getBoolean(KEY_PREFS_FIRST_LAUNCH, true)) {
-                Log.i(TAG, String.format("%1$s is true.", KEY_PREFS_FIRST_LAUNCH));
-                ETPush.pushManager().enablePush();
-                /*
-                    Set this after the call to enablePush() so we don't prematurely
-                    record that we've made it past our first_launch.
-                 */
-                preferencesEditor.putBoolean(KEY_PREFS_FIRST_LAUNCH, false).apply();
-                Log.i(TAG, String.format("Updated %1$s to false", KEY_PREFS_FIRST_LAUNCH));
-            }
-
         } catch (ETException e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -129,6 +104,26 @@ public class HelloWorldApplication extends Application {
     }
 
     /**
+     * EventBus callback listening for a ReadyAimFireInitCompletedEvent.  After we receive this
+     * event we can be certain it's safe to use our ETPush instance.
+     *
+     * @param event the type of event we're listening for.
+     */
+    public void onEvent(final ReadyAimFireInitCompletedEvent event) {
+        /*
+            A good practice is to add the application's version name as a tag that can later
+            be used to target push notifications to specific application versions.
+         */
+        ETPush pushManager = null;
+        try {
+            pushManager = ETPush.getInstance();
+            pushManager.addTag(VERSION_NAME);
+        } catch (ETException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    /**
      * EventBus callback listening for a RegistrationEvent.
      *
      * @param event the type of event we're listening for.
@@ -138,7 +133,7 @@ public class HelloWorldApplication extends Application {
         if (ETPush.getLogLevel() <= Log.DEBUG) {
             Log.d(TAG, "Marketing Cloud update occurred.");
             Log.d(TAG, "Device ID:" + event.getDeviceId());
-            Log.d(TAG, "Device Token:" + event.getDeviceToken());
+            Log.d(TAG, "Device Token:" + event.getSystemToken());
             Log.d(TAG, "Subscriber key:" + event.getSubscriberKey());
             for (Object attribute : event.getAttributes()) {
                 Log.d(TAG, "Attribute " + ((Attribute) attribute).getKey() + ": [" + ((Attribute) attribute).getValue() + "]");
