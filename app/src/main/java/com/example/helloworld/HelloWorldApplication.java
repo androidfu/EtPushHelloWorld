@@ -66,7 +66,7 @@ public class HelloWorldApplication extends Application {
                             .setGcmSenderId(getString(R.string.gcm_sender_id))
                             .setLogLevel(BuildConfig.DEBUG ? Log.VERBOSE : Log.ERROR)
                             .setAnalyticsEnabled(ANALYTICS_ENABLED)
-                            .setPiAnalyticsEnabled(WAMA_ENABLED)
+                            .setWamaEnabled(WAMA_ENABLED)
                             .setCloudPagesEnabled(CLOUD_PAGES_ENABLED)
                             .build()
             );

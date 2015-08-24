@@ -1,9 +1,6 @@
 package com.example.helloworld.ui.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,16 +8,14 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.exacttarget.etpushsdk.ETAnalytics;
 import com.exacttarget.etpushsdk.ETException;
-import com.exacttarget.etpushsdk.ETLocationManager;
 import com.exacttarget.etpushsdk.ETPush;
 import com.example.helloworld.HelloWorldApplication;
 import com.example.helloworld.R;
-import com.radiusnetworks.ibeacon.BleNotAvailableException;
 
 
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -100,7 +95,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
              */
             Log.i(TAG, "Adding attributes.");
             ETPush.pushManager().addAttribute("FirstName", "EtPushHelloWorld");
-            ETPush.pushManager().addAttribute("LastName", getString(R.string.gcm_sender_id));
+            ETPush.pushManager().addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
             Log.i(TAG, "Adding subscriber key.");
             ETPush.pushManager().setSubscriberKey("bmote@exacttarget.com");
 
@@ -150,6 +145,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
          */
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         displayTimeRemaining();
+        ETAnalytics.trackPageView(MainActivity.class.getCanonicalName());
     }
 
     @Override

@@ -1,30 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-    TODO Update the package to match your application's package
--->
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.helloworld">
 
-    <!-- JB4A SDK Google Permissions -->
     <permission
         android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- JB4A SDK Google Permissions -->
-
-    <!-- ET SDK required permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!-- END ET SDK Required Permissions -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--
-        Don't forget to add an Application class to your application and call readyAimFire()
-        TODO Update the name to match your app's application class
-    -->
     <application
         android:name=".HelloWorldApplication"
         android:allowBackup="true"
@@ -32,58 +20,16 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <!-- ETPushReceiver and Service -->
-        <receiver
-            android:name="com.exacttarget.etpushsdk.ETPushReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
-
-                <category android:name="${applicationId}" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.BATTERY_LOW" />
-                <action android:name="android.intent.action.BATTERY_OKAY" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data android:scheme="package" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="${applicationId}.MESSAGE_OPENED" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="com.exacttarget.etpushsdk.ETPushService"
-            android:enabled="true" />
-        <!-- ETPushReceiver and Service -->
-
-        <!-- JB4A SDK Activity required for Cloud Page or Open Direct URLs sent from Marketing Cloud -->
-        <activity
-            android:name="com.exacttarget.etpushsdk.ETLandingPagePresenter"
-            android:label="Landing Page" />
-        <!-- JB4A SDK Activity required for Cloud Page or Open Direct URLs sent from Marketing Cloud -->
-
         <activity
             android:name=".ui.activities.MainActivity"
             android:label="@string/app_name" />
 
-        <!--
-            An activity-alias gives us flexibility in the future.  It allows for future versions of
-            the application to change the launcher activity without disturbing the users' icon on
-            their home screens.
+        <activity
+            android:name="com.exacttarget.etpushsdk.ETLandingPagePresenter"
+            android:label="Landing Page" />
 
-            The alias just has to be after the activity that it references in the targetActivity
-            field but it seems safer to just put it at the end of the activity list. BMOTE 20141210
-        -->
         <activity-alias
-            android:name="com.example.helloworld.ApplicationLauncher"
+            android:name=".ApplicationLauncher"
             android:targetActivity=".ui.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -100,6 +46,32 @@
                 <action android:name="mt_propagation_alarm" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name="com.exacttarget.etpushsdk.ETPushReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <action android:name="com.exacttarget.etpushsdk.SEND_REGISTRATION" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="${applicationId}.MESSAGE_OPENED" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.exacttarget.etpushsdk.ETPushService"
+            android:enabled="true" />
+
     </application>
 
 </manifest>
