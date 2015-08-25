@@ -26,6 +26,7 @@ android {
         }
 
         debug {
+            debuggable true
             minifyEnabled false
             applicationIdSuffix ".debug"
             versionNameSuffix "d"

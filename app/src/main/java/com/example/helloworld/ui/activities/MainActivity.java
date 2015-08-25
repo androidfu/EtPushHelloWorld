@@ -11,7 +11,6 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.exacttarget.etpushsdk.ETAnalytics;
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETPush;
 import com.example.helloworld.HelloWorldApplication;
@@ -22,28 +21,34 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String KEY_PREFS_PUSH_ENABLED = "push_enabled";
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor preferencesEditor;
+    private ToggleButton toggleButtonEnablePush;
+    private TextView countDownTimer;
+    private boolean isPushEnabled;
+    private long alarmTime;
     private final Runnable displayTimeRemainingRunnable = new Runnable() {
         @Override
         public void run() {
             displayTimeRemaining();
         }
     };
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor preferencesEditor;
+    private ETPush etPush;
 
-    private ToggleButton toggleButtonEnablePush;
-    private TextView countDownTimer;
-
-    private boolean isPushEnabled;
-    private long alarmTime;
-
-     @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         sharedPreferences = getSharedPreferences(HelloWorldApplication.HELLO_WORLD_PREFERENCES, MODE_PRIVATE);
         preferencesEditor = sharedPreferences.edit();
+
+        try {
+            etPush = ETPush.getInstance();
+        } catch (ETException e) {
+            e.printStackTrace();
+        }
+
 
         /*
             How long until any changes here are reflected in the Marketing Cloud?
@@ -76,10 +81,49 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 try {
                     if (isPushEnabled) {
                         Log.i(TAG, "Enabling push.");
-                        ETPush.pushManager().enablePush();
+                        etPush.enablePush();
+                        /*
+                            Locale: en-US
+                            POSListId: HCOM_USen-US
+                            AppVersion: 13.0
+                            POSID: HCOM_US
+                            PushOptIn: 1
+                            hcom_device_id: c27dd654-6526-45a5-a968-094cc3292cf1
+
+                            signInTimeStamp: 08/25/2015
+                            SignOutFlag: 0
+
+                            After a successful sign-in we also set three additional attributes:
+
+                            DossierId: 12345678
+                            SubscriberKeyAttrib: email@domain.comHCOM_USen_US
+                            EmailAddress: email@domain.com
+                         */
+                        etPush.addAttribute("Locale", "en-US");
+                        etPush.addAttribute("POSListId", "HCOM_USen-US");
+                        etPush.addAttribute("AppVersion", "13.0");
+                        etPush.addAttribute("POSID", "HCOM_US");
+                        etPush.addAttribute("PushOptIn", "1");
+                        etPush.addAttribute("hcom_device_id", "c27dd654-6526-45a5-a968-094cc3292cf1");
+                        etPush.addAttribute("signInTimeStamp", "08/25/2015");
+                        etPush.addAttribute("SignOutFlag", "0");
+                        etPush.addAttribute("DossierId", "12345678");
+                        etPush.addAttribute("SubscriberKeyAttrib", "email@domain.comHCOM_USen_US");
+                        etPush.addAttribute("EmailAddress", "email@domain.com");
                     } else {
                         Log.i(TAG, "Disabling push.");
-                        ETPush.pushManager().disablePush();
+                        etPush.disablePush();
+                        etPush.removeAttribute("Locale");
+                        etPush.removeAttribute("POSListId");
+                        etPush.removeAttribute("AppVersion");
+                        etPush.removeAttribute("POSID");
+                        etPush.removeAttribute("PushOptIn");
+                        etPush.removeAttribute("hcom_device_id");
+                        etPush.removeAttribute("signInTimeStamp");
+                        etPush.removeAttribute("SignOutFlag");
+                        etPush.removeAttribute("DossierId");
+                        etPush.removeAttribute("SubscriberKeyAttrib");
+                        etPush.removeAttribute("EmailAddress");
                     }
                     ((ToggleButton) v).setChecked(isPushEnabled);
                     preferencesEditor.putBoolean(KEY_PREFS_PUSH_ENABLED, isPushEnabled).apply();
@@ -145,7 +189,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
          */
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         displayTimeRemaining();
-        ETAnalytics.trackPageView(MainActivity.class.getCanonicalName());
+        //ETAnalytics.trackPageView(MainActivity.class.getCanonicalName());
     }
 
     @Override
