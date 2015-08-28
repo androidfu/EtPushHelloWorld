@@ -36,7 +36,7 @@ android {
 
 dependencies {
     // ET SDK
-    compile 'com.exacttarget.etpushsdk:etsdk:4.0.5@aar'
+    compile 'com.exacttarget.etpushsdk:etsdk:4.0.5.243-SNAPSHOT@aar'
 
     // Google Play Services for GCM and Location
     compile 'com.google.android.gms:play-services-gcm:7.8.0'

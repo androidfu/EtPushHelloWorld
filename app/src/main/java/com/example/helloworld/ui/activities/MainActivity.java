@@ -81,24 +81,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 try {
                     if (isPushEnabled) {
                         Log.i(TAG, "Enabling push.");
-                        etPush.enablePush();
-                        /*
-                            Locale: en-US
-                            POSListId: HCOM_USen-US
-                            AppVersion: 13.0
-                            POSID: HCOM_US
-                            PushOptIn: 1
-                            hcom_device_id: c27dd654-6526-45a5-a968-094cc3292cf1
-
-                            signInTimeStamp: 08/25/2015
-                            SignOutFlag: 0
-
-                            After a successful sign-in we also set three additional attributes:
-
-                            DossierId: 12345678
-                            SubscriberKeyAttrib: email@domain.comHCOM_USen_US
-                            EmailAddress: email@domain.com
-                         */
+                        //etPush.enablePush();
+                        etPush.addAttribute("FirstName", "EtPushHelloWorld");
+                        etPush.addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
                         etPush.addAttribute("Locale", "en-US");
                         etPush.addAttribute("POSListId", "HCOM_USen-US");
                         etPush.addAttribute("AppVersion", "13.0");
@@ -110,9 +95,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                         etPush.addAttribute("DossierId", "12345678");
                         etPush.addAttribute("SubscriberKeyAttrib", "email@domain.comHCOM_USen_US");
                         etPush.addAttribute("EmailAddress", "email@domain.com");
+//                        for (int i = 1; i <= 100; i++) {
+//                            etPush.addAttribute(String.format("test_attribute_%d", i), String.valueOf(i));
+//                        }
                     } else {
                         Log.i(TAG, "Disabling push.");
-                        etPush.disablePush();
+                        //etPush.disablePush();
+                        etPush.removeAttribute("FirstName");
+                        etPush.removeAttribute("LastName");
                         etPush.removeAttribute("Locale");
                         etPush.removeAttribute("POSListId");
                         etPush.removeAttribute("AppVersion");
@@ -124,6 +114,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                         etPush.removeAttribute("DossierId");
                         etPush.removeAttribute("SubscriberKeyAttrib");
                         etPush.removeAttribute("EmailAddress");
+//                        for (int i = 1; i <= 100; i++) {
+//                            etPush.removeAttribute(String.format("test_attribute_%d", i));
+//                        }
                     }
                     ((ToggleButton) v).setChecked(isPushEnabled);
                     preferencesEditor.putBoolean(KEY_PREFS_PUSH_ENABLED, isPushEnabled).apply();
@@ -138,8 +131,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 Add First & Last Name Attributes & a Subscriber Key
              */
             Log.i(TAG, "Adding attributes.");
-            ETPush.pushManager().addAttribute("FirstName", "EtPushHelloWorld");
-            ETPush.pushManager().addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
+//            ETPush.pushManager().addAttribute("FirstName", "EtPushHelloWorld");
+//            ETPush.pushManager().addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
             Log.i(TAG, "Adding subscriber key.");
             ETPush.pushManager().setSubscriberKey("bmote@exacttarget.com");
 
