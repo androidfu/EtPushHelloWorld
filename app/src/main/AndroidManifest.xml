@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
 
     <application
         android:name=".HelloWorldApplication"
@@ -52,20 +52,19 @@
             android:name="com.exacttarget.etpushsdk.ETPushReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
+                <action android:name="${applicationId}.MESSAGE_OPENED" />
+                <action android:name="com.exacttarget.etpushsdk.SEND_REGISTRATION" />
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <action android:name="com.exacttarget.etpushsdk.SEND_REGISTRATION" />
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.AIRPLANE_MODE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
 
                 <category android:name="${applicationId}" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <data android:scheme="package" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="${applicationId}.MESSAGE_OPENED" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 

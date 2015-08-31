@@ -11,15 +11,19 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.exacttarget.etpushsdk.ETAnalytics;
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETPush;
+import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEvent;
+import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEventListener;
+import com.exacttarget.etpushsdk.util.EventBus;
 import com.example.helloworld.HelloWorldApplication;
 import com.example.helloworld.R;
 
 
-public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener, ReadyAimFireInitCompletedEventListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = "MainActivity";
     private static final String KEY_PREFS_PUSH_ENABLED = "push_enabled";
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor preferencesEditor;
@@ -43,12 +47,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         sharedPreferences = getSharedPreferences(HelloWorldApplication.HELLO_WORLD_PREFERENCES, MODE_PRIVATE);
         preferencesEditor = sharedPreferences.edit();
 
-        try {
-            etPush = ETPush.getInstance();
-        } catch (ETException e) {
-            e.printStackTrace();
-        }
-
+        EventBus.getInstance().register(this);
 
         /*
             How long until any changes here are reflected in the Marketing Cloud?
@@ -79,44 +78,14 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 toggleButtonEnablePush.toggle();
                 isPushEnabled = !isPushEnabled;
                 try {
-                    if (isPushEnabled) {
-                        Log.i(TAG, "Enabling push.");
-                        //etPush.enablePush();
-                        etPush.addAttribute("FirstName", "EtPushHelloWorld");
-                        etPush.addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
-                        etPush.addAttribute("Locale", "en-US");
-                        etPush.addAttribute("POSListId", "HCOM_USen-US");
-                        etPush.addAttribute("AppVersion", "13.0");
-                        etPush.addAttribute("POSID", "HCOM_US");
-                        etPush.addAttribute("PushOptIn", "1");
-                        etPush.addAttribute("hcom_device_id", "c27dd654-6526-45a5-a968-094cc3292cf1");
-                        etPush.addAttribute("signInTimeStamp", "08/25/2015");
-                        etPush.addAttribute("SignOutFlag", "0");
-                        etPush.addAttribute("DossierId", "12345678");
-                        etPush.addAttribute("SubscriberKeyAttrib", "email@domain.comHCOM_USen_US");
-                        etPush.addAttribute("EmailAddress", "email@domain.com");
-//                        for (int i = 1; i <= 100; i++) {
-//                            etPush.addAttribute(String.format("test_attribute_%d", i), String.valueOf(i));
-//                        }
-                    } else {
-                        Log.i(TAG, "Disabling push.");
-                        //etPush.disablePush();
-                        etPush.removeAttribute("FirstName");
-                        etPush.removeAttribute("LastName");
-                        etPush.removeAttribute("Locale");
-                        etPush.removeAttribute("POSListId");
-                        etPush.removeAttribute("AppVersion");
-                        etPush.removeAttribute("POSID");
-                        etPush.removeAttribute("PushOptIn");
-                        etPush.removeAttribute("hcom_device_id");
-                        etPush.removeAttribute("signInTimeStamp");
-                        etPush.removeAttribute("SignOutFlag");
-                        etPush.removeAttribute("DossierId");
-                        etPush.removeAttribute("SubscriberKeyAttrib");
-                        etPush.removeAttribute("EmailAddress");
-//                        for (int i = 1; i <= 100; i++) {
-//                            etPush.removeAttribute(String.format("test_attribute_%d", i));
-//                        }
+                    if (etPush != null) {
+                        if (isPushEnabled) {
+                            Log.i(TAG, "Enabling push.");
+                            etPush.enablePush();
+                        } else {
+                            Log.i(TAG, "Disabling push.");
+                            etPush.disablePush();
+                        }
                     }
                     ((ToggleButton) v).setChecked(isPushEnabled);
                     preferencesEditor.putBoolean(KEY_PREFS_PUSH_ENABLED, isPushEnabled).apply();
@@ -126,27 +95,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
             }
         });
 
-        try {
-            /*
-                Add First & Last Name Attributes & a Subscriber Key
-             */
-            Log.i(TAG, "Adding attributes.");
-//            ETPush.pushManager().addAttribute("FirstName", "EtPushHelloWorld");
-//            ETPush.pushManager().addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
-            Log.i(TAG, "Adding subscriber key.");
-            ETPush.pushManager().setSubscriberKey("bmote@exacttarget.com");
-
-            if (isPushEnabled) {
-                Log.i(TAG, "Push is enabled.");
-                ETPush.pushManager().enablePush();
-            }
-
-        } catch (ETException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-
         TextView sdkInformation = (TextView) findViewById(R.id.tv_sdkInfo);
-        sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.getSdkVersionName() /* ETPush.ETPushSDKVersionString in version 2014-08 */));
+        sdkInformation.setText(String.format("JB4A SDK v%1$s", ETPush.getSdkVersionName()));
 
         TextView apiInformation = (TextView) findViewById(R.id.tv_apiInfo);
         apiInformation.setText(String.format("Android API %1$s (v%2$s)\n%3$s", Build.VERSION.SDK_INT, Build.VERSION.RELEASE, Build.PRODUCT));
@@ -182,7 +132,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
          */
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         displayTimeRemaining();
-        //ETAnalytics.trackPageView(MainActivity.class.getCanonicalName());
+        ETAnalytics.trackPageView(MainActivity.class.getCanonicalName());
     }
 
     @Override
@@ -198,6 +148,12 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         toggleScreenWake(false);
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getInstance().unregister(this);
+        super.onStop();
     }
 
     /*
@@ -222,6 +178,48 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         } else {
             this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
-
     }
+
+    /**
+     * EventBus callback listening for a ReadyAimFireInitCompletedEvent.  After we receive this
+     * event we can be certain it's safe to use our ETPush instance.
+     *
+     * @param event the type of event we're listening for.
+     */
+    public void onEvent(final ReadyAimFireInitCompletedEvent event) {
+        ETPush etPush = null;
+        try {
+            etPush = event.getEtPush();
+            this.etPush = etPush;
+
+            /*
+                A good practice is to add the application's version name as a tag that can later
+                be used to target push notifications to specific application versions.
+             */
+            etPush.addTag(HelloWorldApplication.VERSION_NAME);
+
+            /*
+                Add First & Last Name Attributes & a Subscriber Key
+             */
+            etPush.addAttribute("FirstName", "EtPushHelloWorld");
+            etPush.addAttribute("LastName", String.valueOf(System.currentTimeMillis()));
+            etPush.setSubscriberKey("bmote@exacttarget.com");
+
+            /*
+                Set our push state based on the toggle button's state now that we know we have an
+                instance of ETPush available to us.  This would allow the user to change the state
+                without affecting the performance of the application.
+             */
+            if (toggleButtonEnablePush != null) {
+                if (toggleButtonEnablePush.isChecked()) {
+                    etPush.enablePush();
+                } else {
+                    etPush.disablePush();
+                }
+            }
+        } catch (ETException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
 }

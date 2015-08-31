@@ -24,7 +24,7 @@ import com.exacttarget.etpushsdk.util.EventBus;
  */
 public class HelloWorldApplication extends Application {
 
-    public static final String TAG = HelloWorldApplication.class.getSimpleName();
+    public static final String TAG = "HelloWorldApplication";
 
     public static final boolean ANALYTICS_ENABLED = true;
     public static final boolean CLOUD_PAGES_ENABLED = true;
@@ -33,13 +33,11 @@ public class HelloWorldApplication extends Application {
     public static final String EXTRAS_REGISTRATION_EVENT = "event";
     public static final String HELLO_WORLD_PREFERENCES = "hello_world_preferences";
     public static final String KEY_PREFS_ALARM_TIME = "mt_alarm_time";
-    public static final String KEY_PREFS_FIRST_LAUNCH = "first_launch";
     public static final String INTENT_ACTION_STRING = "mt_propagation_alarm";
 
     public static String VERSION_NAME;
     public static int VERSION_CODE;
     private static long okToCheckMiddleTier;
-    private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor preferencesEditor;
 
     @Override
@@ -49,14 +47,14 @@ public class HelloWorldApplication extends Application {
         VERSION_NAME = getAppVersionName();
         VERSION_CODE = getAppVersionCode();
 
-        sharedPreferences = getSharedPreferences(HELLO_WORLD_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(HELLO_WORLD_PREFERENCES, MODE_PRIVATE);
         preferencesEditor = sharedPreferences.edit();
 
         /*
             A good practice is to register your application to listen for events posted to a private
             communication bus by the SDK.
          */
-        EventBus.getDefault().register(this);
+        EventBus.getInstance().register(this);
 
         try {
             // Register to receive push notifications.
@@ -82,9 +80,8 @@ public class HelloWorldApplication extends Application {
      * @return a String representing the application version name
      */
     private String getAppVersionName() {
-        String developerBuild = BuildConfig.DEBUG ? "d" : "";
         try {
-            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName + developerBuild;
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -100,26 +97,6 @@ public class HelloWorldApplication extends Application {
             return this.getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    /**
-     * EventBus callback listening for a ReadyAimFireInitCompletedEvent.  After we receive this
-     * event we can be certain it's safe to use our ETPush instance.
-     *
-     * @param event the type of event we're listening for.
-     */
-    public void onEvent(final ReadyAimFireInitCompletedEvent event) {
-        /*
-            A good practice is to add the application's version name as a tag that can later
-            be used to target push notifications to specific application versions.
-         */
-        ETPush pushManager = null;
-        try {
-            pushManager = ETPush.getInstance();
-            pushManager.addTag(VERSION_NAME);
-        } catch (ETException e) {
-            Log.e(TAG, e.getMessage(), e);
         }
     }
 
