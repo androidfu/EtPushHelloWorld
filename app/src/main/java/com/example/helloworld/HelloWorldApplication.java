@@ -15,7 +15,6 @@ import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETPush;
 import com.exacttarget.etpushsdk.ETPushConfig;
 import com.exacttarget.etpushsdk.data.Attribute;
-import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEvent;
 import com.exacttarget.etpushsdk.event.RegistrationEvent;
 import com.exacttarget.etpushsdk.util.EventBus;
 
@@ -57,6 +56,7 @@ public class HelloWorldApplication extends Application {
         EventBus.getInstance().register(this);
 
         try {
+
             // Register to receive push notifications.
             ETPush.readyAimFire(new ETPushConfig.Builder(this)
                             .setEtAppId(getString(R.string.et_app_id))
@@ -66,6 +66,8 @@ public class HelloWorldApplication extends Application {
                             .setAnalyticsEnabled(ANALYTICS_ENABLED)
                             .setPiAnalyticsEnabled(WAMA_ENABLED)
                             .setCloudPagesEnabled(CLOUD_PAGES_ENABLED)
+                            //.setLocationEnabled(true)
+                            //.setProximityEnabled(true)
                             .build()
             );
         } catch (ETException e) {

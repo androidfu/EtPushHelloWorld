@@ -11,17 +11,15 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.exacttarget.etpushsdk.ETAnalytics;
 import com.exacttarget.etpushsdk.ETException;
 import com.exacttarget.etpushsdk.ETPush;
 import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEvent;
-import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEventListener;
 import com.exacttarget.etpushsdk.util.EventBus;
 import com.example.helloworld.HelloWorldApplication;
 import com.example.helloworld.R;
 
 
-public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener, ReadyAimFireInitCompletedEventListener {
+public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "MainActivity";
     private static final String KEY_PREFS_PUSH_ENABLED = "push_enabled";
@@ -132,7 +130,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
          */
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         displayTimeRemaining();
-        ETAnalytics.trackPageView(MainActivity.class.getCanonicalName());
+        //ETAnalytics.trackPageView(MainActivity.class.getCanonicalName()); // 2015-07?
     }
 
     @Override
@@ -189,7 +187,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     public void onEvent(final ReadyAimFireInitCompletedEvent event) {
         ETPush etPush = null;
         try {
-            etPush = event.getEtPush();
+            etPush = ETPush.getInstance();
+            //etPush = event.getEtPush(); // 2015-07
             this.etPush = etPush;
 
             /*
@@ -217,6 +216,10 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                     etPush.disablePush();
                 }
             }
+
+//            ETLocationManager etLocationManager = ETLocationManager.getInstance();
+//            etLocationManager.startWatchingLocation();
+//            etLocationManager.startWatchingProximity();
         } catch (ETException e) {
             Log.e(TAG, e.getMessage(), e);
         }

@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.example.helloworld"
@@ -30,7 +30,9 @@ android {
 }
 
 dependencies {
-    compile 'com.exacttarget.etpushsdk:etsdk:4.1.0.248-SNAPSHOT@aar'
+    compile 'com.exacttarget.etpushsdk:etsdk:4.0.7@aar'
+    compile 'com.android.support:support-v4:23.0.1'
     compile 'com.google.android.gms:play-services-gcm:7.8.0'
-    compile 'com.android.support:support-v4:23.0.0'
+    compile 'com.google.android.gms:play-services-location:7.8.0'
+    compile 'com.radiusnetworks:AndroidIBeaconLibrary:0.7.6'
 }

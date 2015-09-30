@@ -143,6 +143,8 @@
 	*;
 }
 
+-keep interface com.exacttarget.etpushsdk.ETPush.** {*;}
+
 -keep class com.exacttarget.etpushsdk.data.** {
 	public void set*(***);
   	public *** get*();

@@ -16,7 +16,7 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
+        maven { url "http://salesforcefuel.github.io/JB4A-SDK-Android/repository/" }
         maven { url "http://in6827.et.local:8081/nexus/content/groups/public/" }
-        maven { url "http://exacttarget.github.io/JB4A-SDK-Android/repository/" }
     }
 }
