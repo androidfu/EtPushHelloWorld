@@ -157,7 +157,7 @@
 # adding this in to preserve line numbers so that the stack traces
 # can be remapped
 -renamesourcefileattribute SourceFile
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,InnerClasses
 
 ###
 # SDK Explorer specific rules

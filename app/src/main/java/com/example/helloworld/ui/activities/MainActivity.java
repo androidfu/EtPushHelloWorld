@@ -17,6 +17,7 @@ import com.exacttarget.etpushsdk.event.ReadyAimFireInitCompletedEvent;
 import com.exacttarget.etpushsdk.util.EventBus;
 import com.example.helloworld.HelloWorldApplication;
 import com.example.helloworld.R;
+import com.example.helloworld.utils.DebugUtils;
 
 
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -36,6 +37,18 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
         }
     };
     private ETPush etPush;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        /*
+            Wake the device and unlock the screen for Debug builds. See the following files for details:
+                src/debug/AndroidManifest.xml
+                src/debug/java/com.example.helloworld.utils.DebugUtils.java
+                src/release/java/com.example.helloworld.utils.DebugUtils.java
+         */
+        DebugUtils.riseAndShine(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,9 +230,9 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
                 }
             }
 
-//            ETLocationManager etLocationManager = ETLocationManager.getInstance();
-//            etLocationManager.startWatchingLocation();
-//            etLocationManager.startWatchingProximity();
+            //ETLocationManager etLocationManager = ETLocationManager.getInstance();
+            //etLocationManager.startWatchingLocation();
+            //etLocationManager.startWatchingProximity();
         } catch (ETException e) {
             Log.e(TAG, e.getMessage(), e);
         }
